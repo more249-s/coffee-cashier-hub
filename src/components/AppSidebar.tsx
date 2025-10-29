@@ -1,4 +1,4 @@
-import { Coffee, LayoutDashboard, ShoppingCart, Wallet, Package, FileText, Calendar, Settings, LogOut } from "lucide-react";
+import { Coffee, LayoutDashboard, ShoppingCart, Wallet, Package, Settings, LogOut } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -14,19 +14,19 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const menuItems = [
   { title: "لوحة التحكم", url: "/dashboard", icon: LayoutDashboard },
   { title: "المبيعات", url: "/sales", icon: ShoppingCart },
   { title: "المصروفات", url: "/expenses", icon: Wallet },
   { title: "المخزون", url: "/inventory", icon: Package },
-  { title: "ملخص يومي", url: "/daily-summary", icon: FileText },
-  { title: "ملخص شهري", url: "/monthly-summary", icon: Calendar },
   { title: "الإعدادات", url: "/settings", icon: Settings },
 ];
 
 export function AppSidebar() {
   const { state } = useSidebar();
+  const { signOut } = useAuth();
   const isCollapsed = state === "collapsed";
 
   return (
@@ -77,7 +77,8 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-sidebar-border p-4">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          onClick={signOut}
+          className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all"
         >
           <LogOut className="h-5 w-5" />
           {!isCollapsed && <span>تسجيل الخروج</span>}

@@ -8,111 +8,127 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Coffee Shop Warm Theme - Browns & Beiges */
-    --background: 38 40% 97%;
-    --foreground: 25 35% 15%;
+    /* Coffee Shop Premium Theme - Rich Browns & Warm Golds */
+    --background: 35 45% 98%;
+    --foreground: 25 40% 12%;
 
-    --card: 40 35% 95%;
-    --card-foreground: 25 35% 15%;
+    --card: 38 40% 96%;
+    --card-foreground: 25 40% 12%;
 
-    --popover: 40 35% 95%;
-    --popover-foreground: 25 35% 15%;
+    --popover: 38 40% 96%;
+    --popover-foreground: 25 40% 12%;
 
-    /* Rich Coffee Brown */
-    --primary: 25 50% 30%;
-    --primary-foreground: 40 40% 98%;
+    /* Rich Espresso Brown */
+    --primary: 25 60% 25%;
+    --primary-foreground: 40 45% 98%;
+    --primary-glow: 25 55% 40%;
 
-    /* Warm Beige */
-    --secondary: 35 30% 85%;
-    --secondary-foreground: 25 35% 15%;
+    /* Warm Latte */
+    --secondary: 35 35% 82%;
+    --secondary-foreground: 25 40% 12%;
 
     /* Soft Cream */
-    --muted: 40 25% 90%;
-    --muted-foreground: 25 20% 45%;
+    --muted: 40 30% 88%;
+    --muted-foreground: 25 25% 42%;
 
-    /* Caramel Accent */
-    --accent: 30 55% 55%;
-    --accent-foreground: 40 40% 98%;
+    /* Caramel Gold */
+    --accent: 30 70% 50%;
+    --accent-foreground: 40 45% 98%;
 
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 40 40% 98%;
+    --destructive: 0 75% 52%;
+    --destructive-foreground: 40 45% 98%;
 
-    --border: 35 20% 85%;
-    --input: 35 20% 85%;
-    --ring: 25 50% 30%;
+    --border: 35 25% 82%;
+    --input: 35 25% 82%;
+    --ring: 25 60% 25%;
 
-    --radius: 0.75rem;
+    --radius: 0.875rem;
 
-    /* Warm Gradient */
-    --gradient-warm: linear-gradient(135deg, hsl(25 50% 30%), hsl(30 55% 55%));
-    --gradient-soft: linear-gradient(180deg, hsl(40 35% 95%), hsl(38 40% 97%));
+    /* Premium Gradients */
+    --gradient-warm: linear-gradient(135deg, hsl(25 60% 25%), hsl(30 70% 50%));
+    --gradient-soft: linear-gradient(180deg, hsl(38 40% 96%), hsl(35 45% 98%));
+    --gradient-glow: radial-gradient(circle at top, hsl(30 70% 50% / 0.15), transparent);
     
-    /* Shadows */
-    --shadow-warm: 0 4px 20px hsla(25 50% 30% / 0.1);
-    --shadow-glow: 0 0 30px hsla(30 55% 55% / 0.15);
+    /* Enhanced Shadows */
+    --shadow-warm: 0 8px 32px hsla(25 60% 25% / 0.12);
+    --shadow-glow: 0 0 40px hsla(30 70% 50% / 0.2);
+    --shadow-elegant: 0 4px 16px hsla(25 60% 25% / 0.08);
 
-    /* Sidebar - Darker Coffee Theme */
-    --sidebar-background: 25 45% 25%;
-    --sidebar-foreground: 40 40% 95%;
-    --sidebar-primary: 30 55% 55%;
-    --sidebar-primary-foreground: 40 40% 98%;
-    --sidebar-accent: 25 40% 35%;
-    --sidebar-accent-foreground: 40 40% 95%;
-    --sidebar-border: 25 35% 30%;
-    --sidebar-ring: 30 55% 55%;
+    /* Sidebar - Premium Dark Coffee */
+    --sidebar-background: 25 50% 22%;
+    --sidebar-foreground: 40 45% 96%;
+    --sidebar-primary: 30 70% 50%;
+    --sidebar-primary-foreground: 40 45% 98%;
+    --sidebar-accent: 25 45% 32%;
+    --sidebar-accent-foreground: 40 45% 96%;
+    --sidebar-border: 25 40% 28%;
+    --sidebar-ring: 30 70% 50%;
 
-    /* Success - Green for profits */
-    --success: 145 60% 45%;
-    --success-foreground: 40 40% 98%;
+    /* Success - Vibrant Green */
+    --success: 145 65% 45%;
+    --success-foreground: 40 45% 98%;
 
-    /* Warning - Orange for alerts */
-    --warning: 35 90% 55%;
-    --warning-foreground: 25 35% 15%;
+    /* Warning - Rich Orange */
+    --warning: 35 95% 52%;
+    --warning-foreground: 25 40% 12%;
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
   .dark {
-    --background: 25 30% 12%;
-    --foreground: 40 40% 95%;
+    --background: 25 35% 8%;
+    --foreground: 40 45% 96%;
 
-    --card: 25 25% 15%;
-    --card-foreground: 40 40% 95%;
+    --card: 25 30% 12%;
+    --card-foreground: 40 45% 96%;
 
-    --popover: 25 25% 15%;
-    --popover-foreground: 40 40% 95%;
+    --popover: 25 30% 12%;
+    --popover-foreground: 40 45% 96%;
 
-    --primary: 30 55% 55%;
-    --primary-foreground: 25 30% 12%;
+    --primary: 30 70% 50%;
+    --primary-foreground: 25 35% 8%;
+    --primary-glow: 30 65% 60%;
 
-    --secondary: 25 20% 25%;
-    --secondary-foreground: 40 40% 95%;
+    --secondary: 25 25% 22%;
+    --secondary-foreground: 40 45% 96%;
 
-    --muted: 25 20% 20%;
-    --muted-foreground: 40 20% 60%;
+    --muted: 25 25% 18%;
+    --muted-foreground: 40 25% 62%;
 
-    --accent: 30 50% 45%;
-    --accent-foreground: 40 40% 95%;
+    --accent: 30 65% 48%;
+    --accent-foreground: 40 45% 96%;
 
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 40 40% 95%;
+    --destructive: 0 75% 52%;
+    --destructive-foreground: 40 45% 96%;
 
-    --border: 25 20% 25%;
-    --input: 25 20% 25%;
-    --ring: 30 55% 55%;
+    --border: 25 25% 22%;
+    --input: 25 25% 22%;
+    --ring: 30 70% 50%;
 
-    --sidebar-background: 25 25% 10%;
-    --sidebar-foreground: 40 40% 90%;
-    --sidebar-primary: 30 55% 55%;
-    --sidebar-primary-foreground: 25 30% 12%;
-    --sidebar-accent: 25 20% 20%;
-    --sidebar-accent-foreground: 40 40% 90%;
-    --sidebar-border: 25 20% 15%;
-    --sidebar-ring: 30 55% 55%;
+    --gradient-warm: linear-gradient(135deg, hsl(30 70% 50%), hsl(25 60% 30%));
+    --gradient-soft: linear-gradient(180deg, hsl(25 30% 12%), hsl(25 35% 8%));
+    --gradient-glow: radial-gradient(circle at top, hsl(30 70% 50% / 0.15), transparent);
 
-    --success: 145 55% 50%;
-    --success-foreground: 25 30% 12%;
+    --shadow-warm: 0 8px 32px hsla(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 40px hsla(30 70% 50% / 0.3);
+    --shadow-elegant: 0 4px 16px hsla(0 0% 0% / 0.3);
 
-    --warning: 35 85% 60%;
-    --warning-foreground: 25 30% 12%;
+    --sidebar-background: 25 30% 6%;
+    --sidebar-foreground: 40 45% 92%;
+    --sidebar-primary: 30 70% 50%;
+    --sidebar-primary-foreground: 25 35% 8%;
+    --sidebar-accent: 25 25% 18%;
+    --sidebar-accent-foreground: 40 45% 92%;
+    --sidebar-border: 25 25% 12%;
+    --sidebar-ring: 30 70% 50%;
+
+    --success: 145 60% 50%;
+    --success-foreground: 25 35% 8%;
+
+    --warning: 35 90% 58%;
+    --warning-foreground: 25 35% 8%;
   }
 }
 
