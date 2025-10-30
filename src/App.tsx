@@ -34,15 +34,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <SidebarProvider defaultOpen={true}>
-                    <div className="flex min-h-screen w-full">
-                      <AppSidebar />
+                    <div className="flex min-h-screen w-full" dir="rtl">
                       <div className="flex-1 flex flex-col">
                         <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6">
-                          <SidebarTrigger />
+                          <SidebarTrigger className="hover-scale" />
                           <div className="flex-1" />
                           <ThemeToggle />
                         </header>
-                        <main className="flex-1 p-6">
+                        <main className="flex-1 p-4 md:p-8">
                           <Routes>
                             <Route path="/dashboard" element={<Dashboard />} />
                             <Route path="/sales" element={<Sales />} />
@@ -53,6 +52,7 @@ const App = () => (
                           </Routes>
                         </main>
                       </div>
+                      <AppSidebar />
                     </div>
                   </SidebarProvider>
                 </ProtectedRoute>

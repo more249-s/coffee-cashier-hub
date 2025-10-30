@@ -26,20 +26,22 @@ const menuItems = [
 
 export function AppSidebar() {
   const { state } = useSidebar();
-  const { signOut } = useAuth();
+  const { signOut, userRole } = useAuth();
   const isCollapsed = state === "collapsed";
 
   return (
-    <Sidebar collapsible="icon" className="border-l border-sidebar-border">
+    <Sidebar side="right" collapsible="icon" className="border-r border-sidebar-border">
       <SidebarHeader className="border-b border-sidebar-border p-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-primary">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-primary shadow-md">
             <Coffee className="h-6 w-6 text-sidebar-primary-foreground" />
           </div>
           {!isCollapsed && (
             <div className="flex flex-col">
               <span className="text-lg font-bold text-sidebar-foreground">كوفي شوب</span>
-              <span className="text-xs text-sidebar-foreground/60">نظام الإدارة</span>
+              <span className="text-xs text-sidebar-foreground/60">
+                {userRole === 'owner' ? 'المدير' : 'موظف'}
+              </span>
             </div>
           )}
         </div>
@@ -56,15 +58,15 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       className={({ isActive }) =>
-                        `flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                        `flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover-scale ${
                           isActive
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold shadow-sm"
                             : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
                         }`
                       }
                     >
-                      <item.icon className="h-5 w-5" />
-                      {!isCollapsed && <span>{item.title}</span>}
+                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                      {!isCollapsed && <span className="text-right">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -78,10 +80,10 @@ export function AppSidebar() {
         <Button
           variant="ghost"
           onClick={signOut}
-          className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all"
+          className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all hover-scale"
         >
-          <LogOut className="h-5 w-5" />
-          {!isCollapsed && <span>تسجيل الخروج</span>}
+          <LogOut className="h-5 w-5 flex-shrink-0" />
+          {!isCollapsed && <span className="text-right">تسجيل الخروج</span>}
         </Button>
       </SidebarFooter>
     </Sidebar>

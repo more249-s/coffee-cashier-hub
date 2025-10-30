@@ -1,134 +1,167 @@
-import { Plus, Zap, Home, Coffee, Users, Wrench } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import { Zap, Wifi, Home, Fuel, Coffee, Package } from "lucide-react";
 import { QuickActionButton } from "@/components/QuickActionButton";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+interface Expense {
+  id: string;
+  title: string;
+  category: string;
+  amount: number;
+  created_at: string;
+  employee_id: string;
+  profiles: { full_name: string };
+}
+
 export default function Expenses() {
-  const handleQuickExpense = (item: string, price: number) => {
-    toast.success(`تم إضافة ${item} للمصروفات`, {
-      description: `المبلغ: ${price} جنيه`,
-    });
+  const { user } = useAuth();
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dailyTotal, setDailyTotal] = useState(0);
+  const [monthlyTotal, setMonthlyTotal] = useState(0);
+
+  useEffect(() => {
+    fetchExpenses();
+    fetchTotals();
+  }, []);
+
+  const fetchExpenses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('expenses')
+        .select(`*, profiles (full_name)`)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      setExpenses(data || []);
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('حدث خطأ في جلب المصروفات');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTotals = async () => {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+      const { data: dailyData } = await supabase.from('expenses').select('amount').gte('created_at', today.toISOString());
+      const daily = dailyData?.reduce((sum, exp) => sum + Number(exp.amount), 0) || 0;
+      setDailyTotal(daily);
+
+      const { data: monthlyData } = await supabase.from('expenses').select('amount').gte('created_at', firstDayOfMonth.toISOString());
+      const monthly = monthlyData?.reduce((sum, exp) => sum + Number(exp.amount), 0) || 0;
+      setMonthlyTotal(monthly);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleQuickExpense = async (title: string, category: string, amount: number) => {
+    if (!user) {
+      toast.error('يجب تسجيل الدخول أولاً');
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from('expenses').insert({ title, category, amount, employee_id: user.id });
+      if (error) throw error;
+
+      toast.success(`تم إضافة ${title} بنجاح - ${amount} جنيه`);
+      fetchExpenses();
+      fetchTotals();
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('حدث خطأ في إضافة المصروف');
+    }
   };
 
   const fixedExpenses = [
-    { label: "الإيجار", icon: Home, price: 3000 },
-    { label: "الكهرباء", icon: Zap, price: 500 },
-    { label: "الرواتب", icon: Users, price: 4000 },
-    { label: "الصيانة", icon: Wrench, price: 200 },
+    { label: "كهرباء", icon: Zap, price: 500, category: "فواتير" },
+    { label: "إنترنت", icon: Wifi, price: 250, category: "فواتير" },
+    { label: "إيجار", icon: Home, price: 3000, category: "ثابت" },
   ];
 
   const quickSupplies = [
-    { label: "بن", icon: Coffee, price: 150 },
-    { label: "سكر", icon: Coffee, price: 50 },
-    { label: "حليب", icon: Coffee, price: 80 },
+    { label: "بن", icon: Coffee, price: 150, category: "مواد خام" },
+    { label: "حليب", icon: Package, price: 80, category: "مواد خام" },
+    { label: "وقود", icon: Fuel, price: 200, category: "تشغيل" },
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold mb-2">المصروفات</h1>
-          <p className="text-muted-foreground">تتبع جميع مصروفات المحل</p>
-        </div>
-        <Button className="gap-2">
-          <Plus className="h-5 w-5" />
-          إضافة مصروف
-        </Button>
+    <div className="space-y-6 animate-fade-in">
+      <div>
+        <h1 className="text-4xl font-bold mb-2">المصروفات</h1>
+        <p className="text-muted-foreground">تتبع المصروفات اليومية والشهرية</p>
       </div>
 
-      {/* Fixed Expenses */}
-      <Card>
-        <CardHeader>
-          <CardTitle>المصروفات الثابتة الشهرية</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {fixedExpenses.map((expense) => (
-              <QuickActionButton
-                key={expense.label}
-                label={expense.label}
-                icon={expense.icon}
-                price={expense.price.toString()}
-                onClick={() => handleQuickExpense(expense.label, expense.price)}
-              />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Quick Supplies */}
-      <Card>
-        <CardHeader>
-          <CardTitle>المستلزمات السريعة</CardTitle>
-        </CardHeader>
+      <Card className="shadow-elegant">
+        <CardHeader><CardTitle>المصروفات الشهرية الثابتة</CardTitle></CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {quickSupplies.map((supply) => (
-              <QuickActionButton
-                key={supply.label}
-                label={supply.label}
-                icon={supply.icon}
-                price={supply.price.toString()}
-                onClick={() => handleQuickExpense(supply.label, supply.price)}
-              />
+            {fixedExpenses.map((item) => (
+              <QuickActionButton key={item.label} label={item.label} icon={item.icon} price={`${item.price}`} onClick={() => handleQuickExpense(item.label, item.category, item.price)} />
             ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Recent Expenses */}
-      <Card>
-        <CardHeader>
-          <CardTitle>المصروفات الأخيرة</CardTitle>
-        </CardHeader>
+      <Card className="shadow-elegant">
+        <CardHeader><CardTitle>مستلزمات سريعة</CardTitle></CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {[
-              { time: "اليوم 14:00", item: "بن - شراء مستلزمات", amount: 150, category: "مستلزمات" },
-              { time: "اليوم 10:30", item: "صيانة ماكينة القهوة", amount: 200, category: "صيانة" },
-              { time: "أمس", item: "فاتورة الكهرباء", amount: 500, category: "فواتير" },
-              { time: "منذ 3 أيام", item: "حليب - شراء بالجملة", amount: 300, category: "مستلزمات" },
-            ].map((expense, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
-              >
-                <div className="space-y-1 flex-1">
-                  <p className="font-medium">{expense.item}</p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
-                      {expense.category}
-                    </span>
-                    <span className="text-sm text-muted-foreground">{expense.time}</span>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {quickSupplies.map((item) => (
+              <QuickActionButton key={item.label} label={item.label} icon={item.icon} price={`${item.price}`} onClick={() => handleQuickExpense(item.label, item.category, item.price)} />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="bg-gradient-to-br from-destructive/10 to-warning/10 border-destructive/20 shadow-warm">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-2">إجمالي مصروفات اليوم</p>
+              <p className="text-4xl font-bold text-destructive">{dailyTotal.toFixed(2)} جنيه</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-warning/10 to-accent/10 border-warning/20 shadow-warm">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-2">إجمالي مصروفات الشهر</p>
+              <p className="text-4xl font-bold text-warning">{monthlyTotal.toFixed(2)} جنيه</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="shadow-elegant">
+        <CardHeader><CardTitle>آخر المصروفات</CardTitle></CardHeader>
+        <CardContent>
+          {loading ? <p className="text-center text-muted-foreground py-8">جاري التحميل...</p> : expenses.length === 0 ? <p className="text-center text-muted-foreground py-8">لا توجد مصروفات بعد</p> : (
+            <div className="space-y-3">
+              {expenses.map((expense) => (
+                <div key={expense.id} className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-all hover-scale">
+                  <div className="flex-1">
+                    <p className="font-medium">{expense.title}</p>
+                    <p className="text-sm text-muted-foreground">التصنيف: {expense.category}</p>
+                    <p className="text-xs text-muted-foreground mt-1">المسؤول: {expense.profiles.full_name} • {new Date(expense.created_at).toLocaleString('ar-EG')}</p>
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xl font-bold text-destructive">{expense.amount} جنيه</p>
                   </div>
                 </div>
-                <div className="text-left">
-                  <p className="text-lg font-bold text-destructive">-{expense.amount} جنيه</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Summary */}
-      <Card className="bg-gradient-to-br from-destructive/5 to-warning/5 border-destructive/20">
-        <CardContent className="pt-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-2">إجمالي اليوم</p>
-              <p className="text-3xl font-bold text-destructive">850 جنيه</p>
+              ))}
             </div>
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-2">إجمالي الشهر</p>
-              <p className="text-3xl font-bold text-destructive">12,450 جنيه</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-2">المتبقي للميزانية</p>
-              <p className="text-3xl font-bold text-warning">2,550 جنيه</p>
-            </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>
