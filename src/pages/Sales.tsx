@@ -15,7 +15,7 @@ interface Sale {
   created_at: string;
   employee_id: string;
   products: { name: string };
-  profiles: { full_name: string };
+  profiles?: { full_name: string } | null;
 }
 
 export default function Sales() {
@@ -33,12 +33,29 @@ export default function Sales() {
     try {
       const { data, error } = await supabase
         .from('sales')
-        .select(`*, products (name), profiles (full_name)`)
+        .select(`*, products!inner (name)`)
         .order('created_at', { ascending: false })
         .limit(10);
 
       if (error) throw error;
-      setSales(data || []);
+      
+      // Fetch employee names separately
+      if (data && data.length > 0) {
+        const employeeIds = [...new Set(data.map(s => s.employee_id))];
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .in('id', employeeIds);
+        
+        const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
+        const salesWithProfiles = data.map(sale => ({
+          ...sale,
+          profiles: profilesMap.get(sale.employee_id) || null
+        }));
+        setSales(salesWithProfiles);
+      } else {
+        setSales(data || []);
+      }
     } catch (error) {
       console.error('Error:', error);
       toast.error('حدث خطأ في جلب المبيعات');
@@ -161,7 +178,7 @@ export default function Sales() {
                     <p className="font-medium">{sale.products.name}</p>
                     <p className="text-sm text-muted-foreground">الكمية: {sale.quantity} × {sale.unit_price} جنيه</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      البائع: {sale.profiles.full_name} • {new Date(sale.created_at).toLocaleString('ar-EG')}
+                      البائع: {sale.profiles?.full_name || 'غير محدد'} • {new Date(sale.created_at).toLocaleString('ar-EG')}
                     </p>
                   </div>
                   <div className="text-left">

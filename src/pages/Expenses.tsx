@@ -13,7 +13,7 @@ interface Expense {
   amount: number;
   created_at: string;
   employee_id: string;
-  profiles: { full_name: string };
+  profiles?: { full_name: string } | null;
 }
 
 export default function Expenses() {
@@ -32,12 +32,29 @@ export default function Expenses() {
     try {
       const { data, error } = await supabase
         .from('expenses')
-        .select(`*, profiles (full_name)`)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(10);
 
       if (error) throw error;
-      setExpenses(data || []);
+      
+      // Fetch employee names separately
+      if (data && data.length > 0) {
+        const employeeIds = [...new Set(data.map(e => e.employee_id))];
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .in('id', employeeIds);
+        
+        const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
+        const expensesWithProfiles = data.map(expense => ({
+          ...expense,
+          profiles: profilesMap.get(expense.employee_id) || null
+        }));
+        setExpenses(expensesWithProfiles);
+      } else {
+        setExpenses(data || []);
+      }
     } catch (error) {
       console.error('Error:', error);
       toast.error('حدث خطأ في جلب المصروفات');
@@ -153,7 +170,7 @@ export default function Expenses() {
                   <div className="flex-1">
                     <p className="font-medium">{expense.title}</p>
                     <p className="text-sm text-muted-foreground">التصنيف: {expense.category}</p>
-                    <p className="text-xs text-muted-foreground mt-1">المسؤول: {expense.profiles.full_name} • {new Date(expense.created_at).toLocaleString('ar-EG')}</p>
+                    <p className="text-xs text-muted-foreground mt-1">المسؤول: {expense.profiles?.full_name || 'غير محدد'} • {new Date(expense.created_at).toLocaleString('ar-EG')}</p>
                   </div>
                   <div className="text-left">
                     <p className="text-xl font-bold text-destructive">{expense.amount} جنيه</p>
